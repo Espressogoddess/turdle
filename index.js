@@ -3,6 +3,7 @@ var winningWord = '';
 var currentRow = 1;
 var guess = '';
 var gamesPlayed = [];
+var allowedWords = [];
 
 // Query Selectors
 var inputs = document.querySelectorAll('input');
@@ -24,11 +25,11 @@ var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 window.addEventListener('load', setGame);
 
 for (var i = 0; i < inputs.length; i++) {
-  inputs[i].addEventListener('keyup', function() { moveToNextInput(event) });
+  inputs[i].addEventListener('keyup', function(event) { moveToNextInput(event) });
 }
 
 for (var i = 0; i < keyLetters.length; i++) {
-  keyLetters[i].addEventListener('click', function() { clickLetter(event) });
+  keyLetters[i].addEventListener('click', function(event) { clickLetter(event) });
 }
 
 guessButton.addEventListener('click', submitGuess);
@@ -42,13 +43,21 @@ viewStatsButton.addEventListener('click', viewStats);
 // Functions
 function setGame() {
   currentRow = 1;
-  winningWord = getRandomWord();
-  updateInputPermissions();
+  getWords().then(data => {
+    allowedWords = data;
+    var randomIndex = Math.floor(Math.random() * 2500);
+    winningWord = data[randomIndex];
+    updateInputPermissions();
+  })
 }
 
-function getRandomWord() {
-  var randomIndex = Math.floor(Math.random() * 2500);
-  return words[randomIndex];
+function getWords() {
+  return fetch('http://localhost:3001/api/v1/words')
+    .then(response => response.json())
+    // .then(data => {
+    //   var randomIndex = Math.floor(Math.random() * 2500);
+    //   return data[randomIndex];
+    // })
 }
 
 function updateInputPermissions() {
@@ -66,7 +75,7 @@ function updateInputPermissions() {
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
 
-  if( key !== 8 && key !== 46 ) {
+  if(key !== 8 && key !== 46) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
     inputs[indexOfNext].focus();
   }
@@ -110,7 +119,7 @@ function checkIsWord() {
     }
   }
 
-  return words.includes(guess);
+  return allowedWords.includes(guess);
 }
 
 function compareGuess() {
