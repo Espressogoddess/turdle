@@ -48,16 +48,13 @@ function setGame() {
     var randomIndex = Math.floor(Math.random() * 2500);
     winningWord = data[randomIndex];
     updateInputPermissions();
-  })
+  });
 }
 
 function getWords() {
   return fetch('http://localhost:3001/api/v1/words')
-    .then(response => response.json())
-    // .then(data => {
-    //   var randomIndex = Math.floor(Math.random() * 2500);
-    //   return data[randomIndex];
-    // })
+    .then(response => response.json());
+
 }
 
 function updateInputPermissions() {
