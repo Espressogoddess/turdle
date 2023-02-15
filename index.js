@@ -74,6 +74,7 @@ function moveToNextInput(e) {
 
   if(key !== 8 && key !== 46) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
+    //typeError when inputs[indexOfNext] is undefined
     inputs[indexOfNext].focus();
   }
 }
