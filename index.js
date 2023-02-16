@@ -31,7 +31,12 @@ var pluralNumOfCorrectGuesses = document.querySelector('#plural-num-of-correct-g
 
 
 // Event Listeners
-window.addEventListener('load', setGame);
+window.addEventListener('load', () => {
+  fetch('http://localhost:3001/api/v1/games')
+    .then(response => response.json())
+    .then(data => gamesPlayed = data);
+  setGame()
+});
 
 inputs.forEach(input => input.addEventListener('keyup', (event) => moveToNextInput(event)));
 
@@ -226,17 +231,26 @@ function declareResults() {
 }
 
 function recordGameStats() {
+  let gameStat
   if (checkForWin()) {
-    gamesPlayed.push({
+    gameStat = {
       solved: true,
       guesses: currentRow
-    });
+    };
   } else {
-    gamesPlayed.push({
+    gameStat = {
       solved: false,
       guesses: currentRow
-    });
+    };
   }
+  gamesPlayed.push(gameStat);
+  fetch('http://localhost:3001/api/v1/games', {
+    method: 'POST',
+    body: JSON.stringify(gameStat),
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
 }
 
 function changeGameOverText() {
