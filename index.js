@@ -34,6 +34,12 @@ var pluralNumOfCorrectGuesses = document.querySelector('#plural-num-of-correct-g
 window.addEventListener('load', () => {
   fetch('http://localhost:3001/api/v1/games')
     .then(response => response.json())
+    .then(data => data.map(data => {
+      return {
+        solved: data.solved,
+        guesses: data.numGuesses
+      }
+    }))
     .then(data => gamesPlayed = data);
   setGame()
 });
@@ -125,13 +131,14 @@ function getStats() {
 
 function getAvgGuesses() {
   numOfWonGames = getStats();
-  return ((gamesPlayed
-    .filter(game => game.solved)
-    .map(game2 => game2.guesses)
-    .reduce((acc, num) => {
-      acc += num;
-      return acc;
-    }, 0)) / (getStats())).toFixed();
+  const totalNumOfGuesses = gamesPlayed
+  .filter(game => game.solved)
+  .map(game2 => game2.guesses)
+  .reduce((acc, num) => {
+    acc += num;
+    return acc;
+  }, 0);
+  return (totalNumOfGuesses/numOfWonGames).toFixed();
 }
 
 function clickLetter(e) {
