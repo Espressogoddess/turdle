@@ -33,13 +33,10 @@ var pluralNumOfCorrectGuesses = document.querySelector('#plural-num-of-correct-g
 // Event Listeners
 window.addEventListener('load', setGame);
 
-for (var i = 0; i < inputs.length; i++) {
-  inputs[i].addEventListener('keyup', (event) => moveToNextInput(event));
-}
+inputs.forEach(input => input.addEventListener('keyup', (event) => moveToNextInput(event)));
 
-for (var i = 0; i < keyLetters.length; i++) {
-  keyLetters[i].addEventListener('click', (event) => clickLetter(event));
-}
+keyLetters.forEach(keyLetter => keyLetter.addEventListener('click', (event) => clickLetter(event)));
+
 
 guessButton.addEventListener('click', submitGuess);
 
@@ -47,7 +44,7 @@ viewRulesButton.addEventListener('click', viewRules);
 
 viewGameButton.addEventListener('click', viewGame);
 
-viewStatsButton.addEventListener('click',() => {
+viewStatsButton.addEventListener('click', () => {
   updateStats();
   viewStats();
 });
@@ -70,15 +67,16 @@ function getWords() {
 }
 
 function updateInputPermissions() {
-  for (var i = 0; i < inputs.length; i++) {
-    if (!inputs[i].id.includes(`-${currentRow}-`)) {
-      inputs[i].disabled = true;
+  inputs.forEach(input => {
+    if (!input.id.includes(`-${currentRow}-`)) {
+      input.disabled = true;
     } else {
-      inputs[i].disabled = false;
+      input.disabled = false
     }
-  }
+  });
   inputs[0].focus();
 }
+
 
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
@@ -95,7 +93,7 @@ function moveToNextInput(e) {
 
 function updateStats() {
   totalGamesPlayed.innerText = gamesPlayed.length;
-  percentofGamesCorrect.innerText = ((getStats()/gamesPlayed.length)*100).toFixed();
+  percentofGamesCorrect.innerText = ((getStats() / gamesPlayed.length) * 100).toFixed();
   avgNumOfGuesses.innerText = getAvgGuesses();
   pluralNumOfCorrectGuesses
   if (gamesPlayed.length > 1) {
@@ -116,7 +114,7 @@ function getStats() {
     numOfWonGames = 0;
   } else {
     numOfWonGames = gamesPlayed.filter(game => game.solved).length;
-  } 
+  }
   return numOfWonGames;
 }
 
@@ -128,20 +126,18 @@ function getAvgGuesses() {
     .reduce((acc, num) => {
       acc += num;
       return acc;
-    }, 0))/(getStats())).toFixed();
+    }, 0)) / (getStats())).toFixed();
 }
 
 function clickLetter(e) {
   var activeInput = null;
   var activeIndex = null;
-
-  for (var i = 0; i < inputs.length; i++) {
-    if (inputs[i].id.includes(`-${currentRow}-`) && !inputs[i].value && !activeInput) {
-      activeInput = inputs[i];
-      activeIndex = i;
+  inputs.forEach((input, index) => {
+    if (input.id.includes(`-${currentRow}-`) && !input.value && !activeInput) {
+      activeInput = input;
+      activeIndex = index;
     }
-  }
-
+  });
   activeInput.value = e.target.innerText;
   inputs[activeIndex + 1].focus();
 }
@@ -165,41 +161,38 @@ function submitGuess() {
 function checkIsWord() {
   guess = '';
 
-  for (var i = 0; i < inputs.length; i++) {
-    if (inputs[i].id.includes(`-${currentRow}-`)) {
-      guess += inputs[i].value;
+  inputs.forEach(input => {
+    if (input.id.includes(`-${currentRow}-`)) {
+      guess += input.value;
     }
-  }
+  });
 
   return allowedWords.includes(guess);
 }
 
 function compareGuess() {
   var guessLetters = guess.split('');
-
-  for (var i = 0; i < guessLetters.length; i++) {
-
-    if (winningWord.includes(guessLetters[i]) && winningWord.split('')[i] !== guessLetters[i]) {
+  guessLetters.forEach((guessLetter, i) => {
+    if (winningWord.includes(guessLetter) && winningWord.split('')[i] !== guessLetter) {
       updateBoxColor(i, 'wrong-location');
-      updateKeyColor(guessLetters[i], 'wrong-location-key');
+      updateKeyColor(guessLetter, 'wrong-location-key');
     } else if (winningWord.split('')[i] === guessLetters[i]) {
       updateBoxColor(i, 'correct-location');
-      updateKeyColor(guessLetters[i], 'correct-location-key');
+      updateKeyColor(guessLetter, 'correct-location-key');
     } else {
       updateBoxColor(i, 'wrong');
-      updateKeyColor(guessLetters[i], 'wrong-key');
+      updateKeyColor(guessLetter, 'wrong-key');
     }
-  }
+  });
 }
 
 function updateBoxColor(letterLocation, className) {
   var row = [];
-
-  for (var i = 0; i < inputs.length; i++) {
-    if (inputs[i].id.includes(`-${currentRow}-`)) {
-      row.push(inputs[i]);
+  inputs.forEach(input => {
+    if (input.id.includes(`-${currentRow}-`)) {
+      row.push(input);
     }
-  }
+  });
 
   row[letterLocation].classList.add(className);
 }
@@ -207,11 +200,11 @@ function updateBoxColor(letterLocation, className) {
 function updateKeyColor(letter, className) {
   var keyLetter = null;
 
-  for (var i = 0; i < keyLetters.length; i++) {
-    if (keyLetters[i].innerText === letter) {
-      keyLetter = keyLetters[i];
+  keyLetters.forEach(key => {
+    if (key.innerText === letter) {
+      keyLetter = key;
     }
-  }
+  });
 
   keyLetter.classList.add(className);
 }
@@ -275,16 +268,16 @@ function startNewGame() {
 }
 
 function clearGameBoard() {
-  for (var i = 0; i < inputs.length; i++) {
-    inputs[i].value = '';
-    inputs[i].classList.remove('correct-location', 'wrong-location', 'wrong');
-  }
+  inputs.forEach(input => {
+    input.value = '';
+    input.classList.remove('correct-location', 'wrong-location', 'wrong');
+  })
 }
 
 function clearKey() {
-  for (var i = 0; i < keyLetters.length; i++) {
-    keyLetters[i].classList.remove('correct-location-key', 'wrong-location-key', 'wrong-key');
-  }
+  keyLetters.forEach(keyLetter => {
+    keyLetter.classList.remove('correct-location-key', 'wrong-location-key', 'wrong-key');
+  });
 }
 
 // Change Page View Functions
