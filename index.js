@@ -201,9 +201,10 @@ function recordGameStats() {
 
 function changeGameOverText() {
   gameOverGuessCount.innerText = currentRow;
-  const makeBetterName = currentRow < 2
-  if (makeBetterName) {
+  if (currentRow < 2) {
     gameOverGuessGrammar.classList.add('collapsed');
+  } else {
+    gameOverGuessGrammar.classList.remove('collapsed');
   }
   gameStat = gamesPlayed.slice(-1)[0]
   if (!gameStat.solved) {
@@ -211,7 +212,6 @@ function changeGameOverText() {
     winningMessage.classList.add('hidden');
     guess = '';
   } else {
-    gameOverGuessGrammar.classList.remove('collapsed');
     winningMessage.classList.remove('hidden');
     gameOverMessage.innerText = '✨Yay!✨';
     guess = '';
