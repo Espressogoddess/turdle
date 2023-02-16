@@ -3,6 +3,7 @@ var winningWord = '';
 var currentRow = 1;
 var guess = '';
 var gamesPlayed = [];
+var gameStat;
 var allowedWords = [];
 
 // Query Selectors
@@ -21,16 +22,17 @@ var gameOverBox = document.querySelector('#game-over-section');
 var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 var gameOverMessage = document.querySelector('#game-over-message');
+var winningMessage = document.querySelector('#winning-message');
 
 // Event Listeners
 window.addEventListener('load', setGame);
 
 for (var i = 0; i < inputs.length; i++) {
-  inputs[i].addEventListener('keyup', function(event) { moveToNextInput(event) });
+  inputs[i].addEventListener('keyup', (event) => moveToNextInput(event));
 }
 
 for (var i = 0; i < keyLetters.length; i++) {
-  keyLetters[i].addEventListener('click', function(event) { clickLetter(event) });
+  keyLetters[i].addEventListener('click', (event) => clickLetter(event));
 }
 
 guessButton.addEventListener('click', submitGuess);
@@ -59,8 +61,8 @@ function getWords() {
 }
 
 function updateInputPermissions() {
-  for(var i = 0; i < inputs.length; i++) {
-    if(!inputs[i].id.includes(`-${currentRow}-`)) {
+  for (var i = 0; i < inputs.length; i++) {
+    if (!inputs[i].id.includes(`-${currentRow}-`)) {
       inputs[i].disabled = true;
     } else {
       inputs[i].disabled = false;
@@ -72,9 +74,9 @@ function updateInputPermissions() {
 function moveToNextInput(e) {
   var key = e.keyCode || e.charCode;
 
-  if(key !== 8 && key !== 46) {
+  if (key !== 8 && key !== 46) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
-    if(!inputs[indexOfNext]) {
+    if (!inputs[indexOfNext]) {
       return
     } else {
       inputs[indexOfNext].focus();
@@ -87,7 +89,7 @@ function clickLetter(e) {
   var activeIndex = null;
 
   for (var i = 0; i < inputs.length; i++) {
-    if(inputs[i].id.includes(`-${currentRow}-`) && !inputs[i].value && !activeInput) {
+    if (inputs[i].id.includes(`-${currentRow}-`) && !inputs[i].value && !activeInput) {
       activeInput = inputs[i];
       activeIndex = i;
     }
@@ -102,7 +104,9 @@ function submitGuess() {
     errorMessage.innerText = '';
     compareGuess();
     if (checkForWin()) {
-      setTimeout(declareWinner, 1000);
+      setTimeout(declareResults, 1000);
+    } else if (currentRow === 6) {
+      setTimeout(declareResults, 1000);
     } else {
       changeRow();
     }
@@ -114,8 +118,8 @@ function submitGuess() {
 function checkIsWord() {
   guess = '';
 
-  for(var i = 0; i < inputs.length; i++) {
-    if(inputs[i].id.includes(`-${currentRow}-`)) {
+  for (var i = 0; i < inputs.length; i++) {
+    if (inputs[i].id.includes(`-${currentRow}-`)) {
       guess += inputs[i].value;
     }
   }
@@ -139,14 +143,13 @@ function compareGuess() {
       updateKeyColor(guessLetters[i], 'wrong-key');
     }
   }
-
 }
 
 function updateBoxColor(letterLocation, className) {
   var row = [];
 
   for (var i = 0; i < inputs.length; i++) {
-    if(inputs[i].id.includes(`-${currentRow}-`)) {
+    if (inputs[i].id.includes(`-${currentRow}-`)) {
       row.push(inputs[i]);
     }
   }
@@ -175,7 +178,7 @@ function changeRow() {
   updateInputPermissions();
 }
 
-function declareWinner() {
+function declareResults() {
   recordGameStats();
   changeGameOverText();
   viewGameOverMessage();
@@ -184,23 +187,35 @@ function declareWinner() {
 
 function recordGameStats() {
   if (checkForWin()) {
-    gamesPlayed.push({ solved: true, guesses: currentRow });
+    gamesPlayed.push({
+      solved: true,
+      guesses: currentRow
+    });
   } else {
-    gamesPlayed.push({solved: false, guesses: currentRow});
+    gamesPlayed.push({
+      solved: false,
+      guesses: currentRow
+    });
   }
 }
 
 function changeGameOverText() {
-  if (!checkForWin()) {
-    gameOverMessage = '💩 Whomp Whomp Whomp. You lose! Try better next time. 💩'
-  }
   gameOverGuessCount.innerText = currentRow;
-  if (currentRow < 2) {
+  const makeBetterName = currentRow < 2
+  if (makeBetterName) {
     gameOverGuessGrammar.classList.add('collapsed');
+  }
+  gameStat = gamesPlayed.slice(-1)[0]
+  if (!gameStat.solved) {
+    gameOverMessage.innerText = '💩 Whomp Whomp Whomp. You lose! Try better next time.';
+    winningMessage.classList.add('hidden');
   } else {
     gameOverGuessGrammar.classList.remove('collapsed');
+    winningMessage.classList.remove('hidden');
+    gameOverMessage.innerText = '✨Yay!';
   }
 }
+
 
 function startNewGame() {
   clearGameBoard();
