@@ -20,6 +20,7 @@ var stats = document.querySelector('#stats-section');
 var gameOverBox = document.querySelector('#game-over-section');
 var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
+var gameOverMessage = document.querySelector('#game-over-message');
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -65,7 +66,6 @@ function updateInputPermissions() {
       inputs[i].disabled = false;
     }
   }
-
   inputs[0].focus();
 }
 
@@ -74,8 +74,11 @@ function moveToNextInput(e) {
 
   if(key !== 8 && key !== 46) {
     var indexOfNext = parseInt(e.target.id.split('-')[2]) + 1;
-    //typeError when inputs[indexOfNext] is undefined
-    inputs[indexOfNext].focus();
+    if(!inputs[indexOfNext]) {
+      return
+    } else {
+      inputs[indexOfNext].focus();
+    }
   }
 }
 
@@ -180,10 +183,17 @@ function declareWinner() {
 }
 
 function recordGameStats() {
-  gamesPlayed.push({ solved: true, guesses: currentRow });
+  if (checkForWin()) {
+    gamesPlayed.push({ solved: true, guesses: currentRow });
+  } else {
+    gamesPlayed.push({solved: false, guesses: currentRow});
+  }
 }
 
 function changeGameOverText() {
+  if (!checkForWin()) {
+    gameOverMessage = '💩 Whomp Whomp Whomp. You lose! Try better next time. 💩'
+  }
   gameOverGuessCount.innerText = currentRow;
   if (currentRow < 2) {
     gameOverGuessGrammar.classList.add('collapsed');
