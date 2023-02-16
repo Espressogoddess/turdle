@@ -209,10 +209,12 @@ function changeGameOverText() {
   if (!gameStat.solved) {
     gameOverMessage.innerText = '💩 Whomp Whomp Whomp. You lose! Try better next time.';
     winningMessage.classList.add('hidden');
+    guess = '';
   } else {
     gameOverGuessGrammar.classList.remove('collapsed');
     winningMessage.classList.remove('hidden');
-    gameOverMessage.innerText = '✨Yay!';
+    gameOverMessage.innerText = '✨Yay!✨';
+    guess = '';
   }
 }
 
