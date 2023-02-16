@@ -23,6 +23,12 @@ var gameOverGuessCount = document.querySelector('#game-over-guesses-count');
 var gameOverGuessGrammar = document.querySelector('#game-over-guesses-plural');
 var gameOverMessage = document.querySelector('#game-over-message');
 var winningMessage = document.querySelector('#winning-message');
+var totalGamesPlayed = document.querySelector('#stats-total-games');
+var percentofGamesCorrect = document.querySelector('#stats-percent-correct');
+var avgNumOfGuesses = document.querySelector('#stats-average-guesses');
+var pluralGamesPlayed = document.querySelector('#plural-games-played');
+var pluralNumOfCorrectGuesses = document.querySelector('#plural-num-of-correct-guesses');
+
 
 // Event Listeners
 window.addEventListener('load', setGame);
@@ -41,7 +47,10 @@ viewRulesButton.addEventListener('click', viewRules);
 
 viewGameButton.addEventListener('click', viewGame);
 
-viewStatsButton.addEventListener('click', viewStats);
+viewStatsButton.addEventListener('click',() => {
+  updateStats();
+  viewStats();
+});
 
 // Functions
 function setGame() {
@@ -82,6 +91,44 @@ function moveToNextInput(e) {
       inputs[indexOfNext].focus();
     }
   }
+}
+
+function updateStats() {
+  totalGamesPlayed.innerText = gamesPlayed.length;
+  percentofGamesCorrect.innerText = ((getStats()/gamesPlayed.length)*100).toFixed();
+  avgNumOfGuesses.innerText = getAvgGuesses();
+  pluralNumOfCorrectGuesses
+  if (gamesPlayed.length > 1) {
+    pluralGamesPlayed.innerText = 's.';
+  } else {
+    pluralGamesPlayed.innerText = '.';
+  }
+  if (getAvgGuesses() > 1) {
+    pluralNumOfCorrectGuesses.innerText = 'es';
+  } else {
+    pluralNumOfCorrectGuesses.innerText = '';
+  }
+}
+
+function getStats() {
+  let numOfWonGames;
+  if (!gamesPlayed.length) {
+    numOfWonGames = 0;
+  } else {
+    numOfWonGames = gamesPlayed.filter(game => game.solved).length;
+  } 
+  return numOfWonGames;
+}
+
+function getAvgGuesses() {
+  numOfWonGames = getStats();
+  return ((gamesPlayed
+    .filter(game => game.solved)
+    .map(game2 => game2.guesses)
+    .reduce((acc, num) => {
+      acc += num;
+      return acc;
+    }, 0))/(getStats())).toFixed();
 }
 
 function clickLetter(e) {
